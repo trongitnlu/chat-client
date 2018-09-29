@@ -20,7 +20,7 @@ class App extends Component {
   }
   //Connetct với server nodejs, thông qua socket.io
   componentWillMount() {
-    this.socket = io('localhost:6969');
+    this.socket = io('https://trong-chat-server.herokuapp.com/');
     this.socket.on('id', res => this.setState({ user: res })) // lắng nghe event có tên 'id'
     this.socket.on('newMessage', (response) => { this.newMessage(response) }); //lắng nghe event 'newMessage' và gọi hàm newMessage khi có event
   }
