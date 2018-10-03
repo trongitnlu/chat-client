@@ -70,7 +70,6 @@ class App extends Component {
           <MessageList className="messages" user={this.state.user} messages={this.state.messages} />
           <div></div>
           <Input sendMessage={this.sendnewMessage.bind(this)}/>
-          <div>Ngon com</div>
         </div>
       </div>
     );

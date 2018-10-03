@@ -2566,8 +2566,8 @@ var EmojiPicker = function () {
       var anchorOffset = $anchor.offset();
       anchorOffset.right = anchorOffset.left + anchor.outerWidth() - this.$p.outerWidth();
       this.$p.css({
-        top: anchorOffset.top + anchor.outerHeight() + (options.anchorOffsetY || 0),
-        left: anchorOffset[options.anchorAlignment] + (options.anchorOffsetX || 0)
+        top: anchorOffset.top + anchor.outerHeight() + (options.anchorOffsetY || 0)-300,
+        left: anchorOffset[options.anchorAlignment] + (options.anchorOffsetX || 0) -100
       });
     }
   }, {

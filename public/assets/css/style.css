@@ -21,6 +21,8 @@
 .emoji-button {
   cursor: pointer;
   margin: 5px;
+  margin: auto;
+  padding: 10px;
 }
 
 .emoji-editor {
@@ -45,7 +47,7 @@
   background-color: #fff;
   border: 1px solid #ccc;
   position: absolute;
-  width: 210px;
+  width: 218px;
 }
 
 .emoji-picker a {
@@ -58,6 +60,8 @@
 .emoji-selector {
   border-bottom: 1px solid #ccc;
   display: flex;
+  padding: 0px;
+  margin: 0;
 }
 
 .emoji-selector li { margin: 5px; }
