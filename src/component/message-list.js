@@ -9,7 +9,7 @@ export default class MessageList extends React.Component {
         return (
             <ul className="messages">
                 {this.props.messages.map(item =>
-                    <MessageItem user={item.userId === this.props.user ? true : false} message={item.message} />
+                    <MessageItem user={item.userId === this.props.user ? true : false} message={item.message} time={item.time} />
                 )}
             </ul>
         )

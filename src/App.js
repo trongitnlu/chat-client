@@ -12,7 +12,7 @@ class App extends Component {
     //Khởi tạo state,
     this.state = {
       messages: [
-        { id: 1, userId: 0, message: 'Hello' },
+        { id: 1, userId: 0, message: 'Hello', time: "" },
       ],
       user: null,
     }
@@ -20,7 +20,7 @@ class App extends Component {
   }
   //Connetct với server nodejs, thông qua socket.io
   componentWillMount() {
-    this.socket = io('https://trong-chat-server.herokuapp.com/');
+    this.socket = io('http://localhost:6969/');
     this.socket.on('id', res => this.setState({ user: res })) // lắng nghe event có tên 'id'
     this.socket.on('newMessage', (response) => { this.newMessage(response) }); //lắng nghe event 'newMessage' và gọi hàm newMessage khi có event
   }
@@ -32,7 +32,8 @@ class App extends Component {
     messages.push({
       id: max + 1,
       userId: m.id,
-      message: m.data
+      message: m.data,
+      time: m.time
     });
 
     let objMessage = $('.messages');
