@@ -2498,7 +2498,7 @@ var EmojiPicker = function () {
     value: function loadPicker() {
       var _this2 = this;
 
-      var ul = (0, _jquery2.default)('<ul>').addClass('emoji-selector nav nav-tabs');
+      var ul = (0, _jquery2.default)('<ul>').addClass('emoji-selector');
       var tabs = (0, _jquery2.default)('<div>').addClass('tab-content');
 
       var _loop = function _loop(g) {
@@ -2512,8 +2512,10 @@ var EmojiPicker = function () {
 
         var tab = (0, _jquery2.default)('<div>').attr('id', id).addClass('emoji-group tab-pane').data('group', group.name);
 
+        tab.addClass('active').show(); //show content tab
+
         a.on('click', function (e) {
-          (0, _jquery2.default)('.tab-pane').not(tab).hide().removeClass('active');
+          (0, _jquery2.default)('.emoji-group').not(tab).hide().removeClass('active');
           tab.addClass('active').show();
           e.preventDefault();
         });

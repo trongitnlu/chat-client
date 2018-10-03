@@ -15,13 +15,16 @@ class App extends Component {
         { id: 1, userId: 0, message: 'Hello', time: "" },
       ],
       user: null,
+      isConnected: false
     }
     this.socket = null;
   }
   //Connetct với server nodejs, thông qua socket.io
   componentWillMount() {
-    this.socket = io('http://localhost:6969/');
+    this.socket = io('http://localhost:6969/');  //https://trong-chat-server.herokuapp.com/
     this.socket.on('id', res => this.setState({ user: res })) // lắng nghe event có tên 'id'
+    // this.socket.on('connect', res=> { res.isConnected ? this.setState({isConnected: true}) : this.setState({isConnected: false})})
+    this.connectOnetoOne()
     this.socket.on('newMessage', (response) => { this.newMessage(response) }); //lắng nghe event 'newMessage' và gọi hàm newMessage khi có event
   }
   //Khi có tin nhắn mới, sẽ push tin nhắn vào state mesgages, và nó sẽ được render ra màn hình
@@ -56,21 +59,44 @@ class App extends Component {
     }
   }
 
+  connectOnetoOne(){
+    let {isConnected, user} = this.state
+    let socket = this.socket
+    if(!isConnected){
+      console.log(isConnected)
+      socket.emit("connect", {data: user})
+    }else{
+      console.log("Chua connect!")
+    }
+  }
   render() {
     return (
       <div className="App">
-        <div class="chat_window">
-          <div class="top_menu">
-            <div class="buttons">
-              <div class="button close"></div>
+        <div className="chat_window">
+          <div className="top_menu">
+            <div className="buttons">
+              {/* <div class="button close"></div>
               <div class="button minimize"></div>
-              <div class="button maximize"></div>
+              <div class="button maximize"></div> */}
+              <ul className="nav nav-tabs">
+                <li className="active"><a data-toggle="tab" href="#home">Chat Group</a></li>
+                <li><a data-toggle="tab" href="#menu1">Chat với 1 người</a></li>
+              </ul>
+
+
             </div>
-            <div class="title">Chat</div>
+            <div className="title">Chat</div>
           </div>
-          <MessageList className="messages" user={this.state.user} messages={this.state.messages} />
+          <div className="tab-content">
+            <div id="home" className="tab-pane fade in active">
+              <MessageList className="messages" user={this.state.user} messages={this.state.messages} />
+            </div>
+            <div id="menu1" className="tab-pane fade">
+              <MessageList className="messages" user={this.state.user} messages={this.state.messages} />
+            </div>
+          </div>
           <div></div>
-          <Input sendMessage={this.sendnewMessage.bind(this)}/>
+          <Input sendMessage={this.sendnewMessage.bind(this)} />
         </div>
       </div>
     );

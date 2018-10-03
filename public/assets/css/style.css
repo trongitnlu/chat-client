@@ -21,7 +21,7 @@
 .emoji-button {
   cursor: pointer;
   margin: 5px;
-  margin: auto;
+  /* margin: auto; */
   padding: 10px;
 }
 
@@ -48,6 +48,11 @@
   border: 1px solid #ccc;
   position: absolute;
   width: 218px;
+}
+.emoji-picker>li>a {
+  position: relative;
+  display: block;
+  padding: 0
 }
 
 .emoji-picker a {
