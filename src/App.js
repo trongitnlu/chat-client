@@ -6,6 +6,7 @@ import $ from 'jquery'
 import _map from 'lodash/map'
 import io from 'socket.io-client'
 
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +16,9 @@ class App extends Component {
         { id: 1, userId: 0, message: 'Hello', time: "" },
       ],
       user: null,
-      isConnected: false
+      guest: null,
+      isConnected: false,
+      isSearch: false
     }
     this.socket = null;
   }
@@ -23,10 +26,9 @@ class App extends Component {
   componentWillMount() {
     this.socket = io('http://localhost:6969/');  //https://trong-chat-server.herokuapp.com/
     this.socket.on('id', res => this.setState({ user: res })) // lắng nghe event có tên 'id'
-    // this.socket.on('connect', res=> { res.isConnected ? this.setState({isConnected: true}) : this.setState({isConnected: false})})
-    this.connectOnetoOne()
     this.socket.on('newMessage', (response) => { this.newMessage(response) }); //lắng nghe event 'newMessage' và gọi hàm newMessage khi có event
   }
+
   //Khi có tin nhắn mới, sẽ push tin nhắn vào state mesgages, và nó sẽ được render ra màn hình
   newMessage(m) {
     const messages = this.state.messages;
@@ -59,13 +61,35 @@ class App extends Component {
     }
   }
 
-  connectOnetoOne(){
-    let {isConnected, user} = this.state
+  actionDisConnect(idGuest) {
+    let btnSearch = $('#btnSearch')
+    var idSocket = idGuest + "a"
+    if (this.state.isConnected)
+      this.socket.on(idSocket, res => {
+        if (res) {
+          this.setState({ isConnected: false, isSearch: false })
+          btnSearch.show()
+        } else {
+          btnSearch.hide()
+        }
+      })
+  }
+
+  connectOnetoOne() {
+    this.setState({ isSearch: true })
+    let { isConnected, user } = this.state
     let socket = this.socket
-    if(!isConnected){
+    let btnSearch = $('#btnSearch')
+
+    if (!isConnected) {
+      this.socket.emit("ketnoi", { user }); //gửi event về server
+      this.socket.on(this.state.user, res => {
+        btnSearch.hide()
+        this.setState({ guest: res.guestId, isConnected: true, isSearch: true })
+        this.actionDisConnect(this.state.guest)
+      })
       console.log(isConnected)
-      socket.emit("connect", {data: user})
-    }else{
+    } else {
       console.log("Chua connect!")
     }
   }
@@ -85,14 +109,15 @@ class App extends Component {
 
 
             </div>
-            <div className="title">Chat</div>
+            <div className="title">{this.state.user}</div>
           </div>
           <div className="tab-content">
             <div id="home" className="tab-pane fade in active">
               <MessageList className="messages" user={this.state.user} messages={this.state.messages} />
             </div>
             <div id="menu1" className="tab-pane fade">
-              <MessageList className="messages" user={this.state.user} messages={this.state.messages} />
+              <button id="btnSearch" className="btn-primary" onClick={() => { this.connectOnetoOne() }} >{this.state.isSearch ? 'Đang tìm' : "Tìm người"}</button>
+              {/* <MessageList className="messages" user={this.state.user} messages={this.state.messages} /> */}
             </div>
           </div>
           <div></div>
