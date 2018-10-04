@@ -21,7 +21,7 @@
 .emoji-button {
   cursor: pointer;
   margin: 5px;
-  margin: auto;
+  /* margin: auto; */
   padding: 10px;
 }
 
@@ -49,6 +49,11 @@
   position: absolute;
   width: 218px;
 }
+.emoji-picker>li>a {
+  position: relative;
+  display: block;
+  padding: 0
+}
 
 .emoji-picker a {
   cursor: pointer;
@@ -72,6 +77,21 @@
   height: 200px;
   overflow-y: scroll;
   padding: 3px;
+}
+.alert-primary {
+  color: #004085;
+  background-color: #cce5ff;
+  border-color: #b8daff;
+  margin-bottom: 0px;
+}
+.alert {
+  padding: 15px;
+  margin-bottom: 0px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.btnSearch{
+  margin: 20px;
 }
 
 /*# sourceMappingURL=style.css.map */
