@@ -78,5 +78,20 @@
   overflow-y: scroll;
   padding: 3px;
 }
+.alert-primary {
+  color: #004085;
+  background-color: #cce5ff;
+  border-color: #b8daff;
+  margin-bottom: 0px;
+}
+.alert {
+  padding: 15px;
+  margin-bottom: 0px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.btnSearch{
+  margin: 20px;
+}
 
 /*# sourceMappingURL=style.css.map */

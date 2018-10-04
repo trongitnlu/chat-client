@@ -13,12 +13,14 @@ class App extends Component {
     //Khởi tạo state,
     this.state = {
       messages: [
-        { id: 1, userId: 0, message: 'Hello', time: "" },
+        { id: 1, userId: 0, message: 'Hello', time: "" }
       ],
+      mesgagesRoomOne: [],
       user: null,
       guest: null,
       isConnected: false,
-      isSearch: false
+      isSearch: false,
+      isAlert: false
     }
     this.socket = null;
   }
@@ -32,36 +34,50 @@ class App extends Component {
   //Khi có tin nhắn mới, sẽ push tin nhắn vào state mesgages, và nó sẽ được render ra màn hình
   newMessage(m) {
     const messages = this.state.messages;
+    const mesgagesRoomOne = this.state.mesgagesRoomOne
     let ids = _map(messages, 'id');
     let max = Math.max(...ids);
-    messages.push({
-      id: max + 1,
-      userId: m.id,
-      message: m.data,
-      time: m.time
-    });
-
+    if (m.isGroup) {
+      messages.push({
+        id: max + 1,
+        userId: m.id,
+        message: m.data,
+        time: m.time
+      })
+    } else {
+      this.setState({ isAlert: false })
+      mesgagesRoomOne.push({
+        id: max + 1,
+        userId: m.id,
+        message: m.data,
+        time: m.time
+      })
+    }
     let objMessage = $('.messages');
     if (objMessage[0].scrollHeight - objMessage[0].scrollTop === objMessage[0].clientHeight) {
-      this.setState({ messages });
-      objMessage.animate({ scrollTop: objMessage.prop('scrollHeight') }, 100); //tạo hiệu ứng cuộn khi có tin nhắn mới
+      this.setState({ messages, mesgagesRoomOne });
+      // objMessage.animate({ scrollTop: objMessage.prop('scrollHeight') }, 100); //tạo hiệu ứng cuộn khi có tin nhắn mới
+      $('.messages').scrollTop($('.messages').scrollTop() + 99999)
 
     } else {
-      this.setState({ messages });
+      this.setState({ messages, mesgagesRoomOne });
       if (m.id === this.state.user) {
-        objMessage.animate({ scrollTop: objMessage.prop('scrollHeight') }, 100);
+        // objMessage.animate({ scrollTop: objMessage.prop('scrollHeight') }, 100);
+      $('.messages').scrollTop($('.messages').scrollTop() + 99999)
+
       }
     }
   }
   //Gửi event socket newMessage với dữ liệu là nội dung tin nhắn
-  sendnewMessage(m) {
+  sendnewMessage(m, isOneToOne) {
+    this.setState({ isAlert: false })
     if (m.value) {
-      this.socket.emit("newMessage", m.value); //gửi event về server
+      this.socket.emit("newMessage", { message: m.value, user: this.state.user, guest: this.state.guest, isOneToOne: isOneToOne }); //gửi event về server
       m.value = "";
     }
   }
 
-  actionDisConnect(idGuest) {
+  actionDisConnect(idGuest) { //Kiểm tra nếu mất kết nối thì set lại trạng thái isConnected, isSearch và hiện nút tìm kiếm
     let btnSearch = $('#btnSearch')
     var idSocket = idGuest + "a"
     if (this.state.isConnected)
@@ -76,21 +92,21 @@ class App extends Component {
   }
 
   connectOnetoOne() {
-    this.setState({ isSearch: true })
-    let { isConnected, user } = this.state
-    let socket = this.socket
+    let { isConnected, user, isSearch } = this.state
     let btnSearch = $('#btnSearch')
+    this.setState({ mesgagesRoomOne: [] })
 
-    if (!isConnected) {
+    if (!isConnected && !isSearch) {
+      this.setState({ isSearch: true })
       this.socket.emit("ketnoi", { user }); //gửi event về server
       this.socket.on(this.state.user, res => {
         btnSearch.hide()
-        this.setState({ guest: res.guestId, isConnected: true, isSearch: true })
+        this.setState({ guest: res.guestId, isConnected: true, isSearch: false, isAlert: true })
         this.actionDisConnect(this.state.guest)
       })
-      console.log(isConnected)
     } else {
-      console.log("Chua connect!")
+      alert("Đang tìm kiếm!")
+      console.log("Đang tìm kiếm!")
     }
   }
   render() {
@@ -103,8 +119,19 @@ class App extends Component {
               <div class="button minimize"></div>
               <div class="button maximize"></div> */}
               <ul className="nav nav-tabs">
-                <li className="active"><a data-toggle="tab" href="#home">Chat Group</a></li>
-                <li><a data-toggle="tab" href="#menu1">Chat với 1 người</a></li>
+                <li className="active">
+                  <a data-toggle="tab" href="#home">
+                    <span>
+                      <img src="https://cdn3.iconfinder.com/data/icons/toolbar-people/512/user_network_man_internet_world-512.png" style={{ width: "20px", height: "20px" }} />
+                    </span>
+                  </a>
+                </li>
+                <li><a data-toggle="tab" href="#menu1">
+                  <span>
+                    <img src="https://cdn1.iconfinder.com/data/icons/users-and-groups/32/user-group-chat-02-512.png" style={{ width: "20px", height: "20px" }} />
+                  </span>
+                </a>
+                </li>
               </ul>
 
 
@@ -113,15 +140,16 @@ class App extends Component {
           </div>
           <div className="tab-content">
             <div id="home" className="tab-pane fade in active">
-              <MessageList className="messages" user={this.state.user} messages={this.state.messages} />
+              <MessageList user={this.state.user} messages={this.state.messages} />
+              <Input checkConnect={true} sendMessage={this.sendnewMessage.bind(this)} isOneToOne={false} />
             </div>
             <div id="menu1" className="tab-pane fade">
-              <button id="btnSearch" className="btn-primary" onClick={() => { this.connectOnetoOne() }} >{this.state.isSearch ? 'Đang tìm' : "Tìm người"}</button>
-              {/* <MessageList className="messages" user={this.state.user} messages={this.state.messages} /> */}
+              <button id="btnSearch" className="btn btn-primary btnSearch" onClick={() => { this.connectOnetoOne() }} >{this.state.isSearch ? 'Đang tìm' : "Tìm người"}</button>
+              <div className={this.state.isConnected && this.state.isAlert ? "alert alert-primary" : "hidden"}><span>Đã kết nối với người lạ!</span></div>
+              <MessageList user={this.state.user} messages={this.state.mesgagesRoomOne} />
+              <Input checkConnect={this.state.isConnected} sendMessage={this.sendnewMessage.bind(this)} isOneToOne={true} />
             </div>
           </div>
-          <div></div>
-          <Input sendMessage={this.sendnewMessage.bind(this)} />
         </div>
       </div>
     );
