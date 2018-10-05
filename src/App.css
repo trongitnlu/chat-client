@@ -91,10 +91,10 @@ body {
   background-color: #ffe6cb;
   margin-left: 20px;
 }
-.messages .message.left .text_wrapper::after, .messages .message.left .text_wrapper::before {
+/* .messages .message.left .text_wrapper::after, .messages .message.left .text_wrapper::before {
   right: 100%;
   border-right-color: #ffe6cb;
-}
+} */
 .messages .message.left .text {
   color: #c48843;
 }

@@ -20,14 +20,15 @@ class App extends Component {
       guest: null,
       isConnected: false,
       isSearch: false,
-      isAlert: false
+      isAlert: false,
+      color: "#ffe6cb"
     }
     this.socket = null;
   }
   //Connetct với server nodejs, thông qua socket.io
   componentWillMount() {
     this.socket = io('http://localhost:6969/');  //https://trong-chat-server.herokuapp.com/
-    this.socket.on('id', res => this.setState({ user: res })) // lắng nghe event có tên 'id'
+    this.socket.on('id', res => this.setState({ user: res.user, color: res.color })) // lắng nghe event có tên 'id'
     this.socket.on('newMessage', (response) => { this.newMessage(response) }); //lắng nghe event 'newMessage' và gọi hàm newMessage khi có event
   }
 
@@ -42,7 +43,8 @@ class App extends Component {
         id: max + 1,
         userId: m.id,
         message: m.data,
-        time: m.time
+        time: m.time,
+        color: m.color
       })
     } else {
       this.setState({ isAlert: false })
@@ -50,7 +52,8 @@ class App extends Component {
         id: max + 1,
         userId: m.id,
         message: m.data,
-        time: m.time
+        time: m.time,
+        color: m.color
       })
     }
     let objMessage = $('.messages');
@@ -63,16 +66,17 @@ class App extends Component {
       this.setState({ messages, mesgagesRoomOne });
       if (m.id === this.state.user) {
         // objMessage.animate({ scrollTop: objMessage.prop('scrollHeight') }, 100);
-      $('.messages').scrollTop($('.messages').scrollTop() + 99999)
+        $('.messages').scrollTop($('.messages').scrollTop() + 99999)
 
       }
     }
   }
   //Gửi event socket newMessage với dữ liệu là nội dung tin nhắn
   sendnewMessage(m, isOneToOne) {
+    let { color, user, guest, isConnected } = this.state
     this.setState({ isAlert: false })
     if (m.value) {
-      this.socket.emit("newMessage", { message: m.value, user: this.state.user, guest: this.state.guest, isOneToOne: isOneToOne }); //gửi event về server
+      this.socket.emit("newMessage", { message: m.value, user: user, guest: guest, isOneToOne: isOneToOne, color: color }); //gửi event về server
       m.value = "";
     }
   }
