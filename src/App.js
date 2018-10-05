@@ -12,9 +12,8 @@ class App extends Component {
     super(props);
     //Khởi tạo state,
     this.state = {
-      messages: [
-        { id: 1, userId: 0, message: 'Hello', time: "" }
-      ],
+      messages: [],
+      isConnectToServer: false,
       mesgagesRoomOne: [],
       user: null,
       guest: null,
@@ -28,7 +27,7 @@ class App extends Component {
   //Connetct với server nodejs, thông qua socket.io
   componentWillMount() {
     this.socket = io('http://localhost:6969/');  //https://trong-chat-server.herokuapp.com/
-    this.socket.on('id', res => this.setState({ user: res.user, color: res.color })) // lắng nghe event có tên 'id'
+    this.socket.on('id', res => this.setState({ user: res.user, color: res.color, isConnectToServer: true })) // lắng nghe event có tên 'id'
     this.socket.on('newMessage', (response) => { this.newMessage(response) }); //lắng nghe event 'newMessage' và gọi hàm newMessage khi có event
     this.socket.on("thoat", res => {
       console.log(`Thoat ${res}`)
@@ -79,21 +78,26 @@ class App extends Component {
   }
   //Gửi event socket newMessage với dữ liệu là nội dung tin nhắn
   sendnewMessage(m, isOneToOne) {
-    let { color, user, guest, isConnected } = this.state
-    this.setState({ isAlert: false })
-    if (m.value) {
-      if (isOneToOne) {
-        if (isConnected) {
-          this.socket.emit("newMessageOneToOne", { message: m.value, user: user, guest: guest, isOneToOne: true, color: color }); //gửi event về server
-          m.value = "";
-        } else {
-          alert("Chưa kết nối với người lạ!")
-        }
+    const { isConnectToServer } = this.state
+    if (isConnectToServer) {
+      let { color, user, guest, isConnected } = this.state
+      this.setState({ isAlert: false })
+      if (m.value) {
+        if (isOneToOne) {
+          if (isConnected) {
+            this.socket.emit("newMessageOneToOne", { message: m.value, user: user, guest: guest, isOneToOne: true, color: color }); //gửi event về server
+            m.value = "";
+          } else {
+            alert("Chưa kết nối với người lạ!")
+          }
 
-      } else {
-        this.socket.emit("newMessage", { message: m.value, user: user, guest: guest, isGroup: true, color: color }); //gửi event về server
-        m.value = "";
+        } else {
+          this.socket.emit("newMessage", { message: m.value, user: user, guest: guest, isGroup: true, color: color }); //gửi event về server
+          m.value = "";
+        }
       }
+    } else {
+      alert("Xin vui lòng đợi kết nối tới hệ thống!")
     }
   }
 
@@ -131,7 +135,7 @@ class App extends Component {
   }
 
   render() {
-    const { isConnected } = this.state
+    const { isConnected, isConnectToServer } = this.state
     return (
       <div className="App">
         <div className="chat_window">
@@ -161,6 +165,7 @@ class App extends Component {
             <div className="title">{this.state.user}</div>
           </div>
           <div className="tab-content">
+            <div className={!isConnectToServer ? "alert alert-primary" : "hidden"}><span>Đang kết nối tới hệ thống, vui lòng chờ...</span></div>
             <div id="home" className="tab-pane fade in active">
               <MessageList user={this.state.user} messages={this.state.messages} />
               <Input checkConnect={true} sendMessage={this.sendnewMessage.bind(this)} isOneToOne={false} />
@@ -174,7 +179,7 @@ class App extends Component {
                 <div className={isConnected && this.state.isAlert ? "alert alert-primary" : "hidden"}><span>Đã kết nối với người lạ!</span></div>
               </div>
               <MessageList user={this.state.user} messages={this.state.mesgagesRoomOne} />
-              <Input checkConnect={isConnected} sendMessage={this.sendnewMessage.bind(this)} isOneToOne={true} />
+              <Input sendMessage={this.sendnewMessage.bind(this)} isOneToOne={true} />
             </div>
           </div>
         </div>
