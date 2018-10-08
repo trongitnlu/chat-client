@@ -18,5 +18,5 @@
     "eject": "react-scripts eject",
     "deploy": "react-scripts build && gh-pages -d build"
   },
-  "homepage" : "https://trongitnlu.github.io/chat-client/"
+  "homepage": "https://trongitnlu.github.io/chat-client/"
 }

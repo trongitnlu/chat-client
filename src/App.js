@@ -20,19 +20,19 @@ class App extends Component {
       isConnected: false,
       isSearch: false,
       isAlert: false,
+      isDisconnectOneToOne: false,
       color: "#ffe6cb",
     }
     this.socket = null;
   }
   //Connetct với server nodejs, thông qua socket.io
   componentWillMount() {
-    this.socket = io('http://localhost:6969/');  //https://trong-chat-server.herokuapp.com/
+    this.socket = io('https://trong-chat-server.herokuapp.com/');  //https://trong-chat-server.herokuapp.com/
     this.socket.on('id', res => this.setState({ user: res.user, color: res.color, isConnectToServer: true })) // lắng nghe event có tên 'id'
     this.socket.on('newMessage', (response) => { this.newMessage(response) }); //lắng nghe event 'newMessage' và gọi hàm newMessage khi có event
     this.socket.on("thoat", res => {
-      console.log(`Thoat ${res}`)
       if (res) {
-        this.setState({ guest: null, isConnected: false, isSearch: false, isAlert: false })
+        this.setState({ guest: null, isConnected: false, isSearch: false, isAlert: false, isDisconnectOneToOne: true })
       }
     })
   }
@@ -106,7 +106,7 @@ class App extends Component {
     if (this.state.isConnected)
       this.socket.on(idSocket, res => {
         if (res) {
-          this.setState({ isConnected: false, isSearch: false })
+          this.setState({ isConnected: false, isSearch: false, isDisconnectOneToOne: true })
         } else {
         }
       })
@@ -119,7 +119,7 @@ class App extends Component {
       this.setState({ isSearch: true })
       this.socket.emit("ketnoi", { user }); //gửi event về server
       this.socket.on(this.state.user, res => {
-        this.setState({ guest: res.guestId, isConnected: true, isSearch: false, isAlert: true, roomOneToOne: res.room })
+        this.setState({ guest: res.guestId, isConnected: true, isSearch: false, isAlert: true, roomOneToOne: res.room, isDisconnectOneToOne: false })
         this.actionDisConnect(this.state.guest)
         this.socket.on('newMessageOneToOne', (response) => { this.newMessage(response) });
       })
@@ -135,7 +135,7 @@ class App extends Component {
   }
 
   render() {
-    const { isConnected, isConnectToServer } = this.state
+    const { isConnected, isConnectToServer, isDisconnectOneToOne, isSearch } = this.state
     return (
       <div className="App">
         <div className="chat_window">
@@ -172,11 +172,12 @@ class App extends Component {
             </div>
             <div id="menu1" className="tab-pane fade">
               <div className='clearfix' style={{ height: 'auto' }} align="center">
+                <div className={isConnected && this.state.isAlert ? "alert alert-primary" : "hidden"}><span>Đã kết nối với người lạ!</span></div>
+                <div className={isDisconnectOneToOne && !isSearch ? "alert alert-warning" : "hidden"}><span>Đã mất kết nối với người lạ!</span></div>
                 <button id="btnSearch" className={!isConnected ? 'btn btn-primary btnSearch' : "hidden"} onClick={() => { this.connectOnetoOne() }} >{this.state.isSearch ? 'Đang tìm' : "Tìm người"}</button>
 
                 <a style={{ padding: '30px', cursor: "pointer", color: 'blue' }}
                   id="btnOutRoom" className={isConnected ? '' : "hidden"} onClick={() => { this.disConnectOntoTone() }} >Thoát</a>
-                <div className={isConnected && this.state.isAlert ? "alert alert-primary" : "hidden"}><span>Đã kết nối với người lạ!</span></div>
               </div>
               <MessageList user={this.state.user} messages={this.state.mesgagesRoomOne} />
               <Input sendMessage={this.sendnewMessage.bind(this)} isOneToOne={true} />

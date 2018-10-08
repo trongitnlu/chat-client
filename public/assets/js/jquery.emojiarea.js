@@ -2557,7 +2557,7 @@ var EmojiPicker = function () {
     key: 'insertEmoji',
     value: function insertEmoji(emoji) {
       if (typeof this.cb === 'function') this.cb(emoji, this.o);
-      this.hide();
+      // this.hide();
     }
   }, {
     key: 'reposition',
