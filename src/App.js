@@ -44,6 +44,8 @@ class App extends Component {
     let ids = _map(messages, 'id');
     let max = Math.max(...ids);
     if (m.isGroup) {
+      if(m.id != this.state.user)
+      document.title = "Bạn có tin nhắn mới ở tab group"
       messages.push({
         id: max + 1,
         userId: m.id,
@@ -52,6 +54,8 @@ class App extends Component {
         color: m.color
       })
     } else {
+      if(m.id != this.state.user)
+      document.title = "Bạn có tin nhắn mới ở tab đôi"
       this.setState({ isAlert: false })
       mesgagesRoomOne.push({
         id: max + 1,
@@ -78,6 +82,7 @@ class App extends Component {
   }
   //Gửi event socket newMessage với dữ liệu là nội dung tin nhắn
   sendnewMessage(m, isOneToOne) {
+    document.title = "Chat sinh vien"
     const { isConnectToServer } = this.state
     if (isConnectToServer) {
       let { color, user, guest, isConnected } = this.state
@@ -162,7 +167,7 @@ class App extends Component {
 
 
             </div>
-            <div className="title">{this.state.user}</div>
+            <div className="title">Chat Sinh Viên</div>
           </div>
           <div className="tab-content">
             <div className={!isConnectToServer ? "alert alert-primary" : "hidden"}><span>Đang kết nối tới hệ thống, vui lòng chờ...</span></div>
