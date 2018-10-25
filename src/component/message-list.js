@@ -8,8 +8,8 @@ export default class MessageList extends React.Component {
     render() {
         return (
             <ul className="messages">
-                {this.props.messages.map(item =>
-                    <MessageItem user={item.userId === this.props.user ? true : false} message={item.message} time={item.time} color={item.color} guest={item.userId} />
+                {this.props.messages.map((item, index) =>
+                    <MessageItem key={index} user={item.userId === this.props.user ? true : false} message={item.message} time={item.time} color={item.color} guest={item.userId} />
                 )}
             </ul>
         )
