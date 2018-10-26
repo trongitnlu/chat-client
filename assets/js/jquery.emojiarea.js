@@ -1325,6 +1325,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     _EmojiStyleGenerator2.default.injectImageStyles(e);
   });
   (0, _jquery2.default)('[data-emojiarea]').emojiarea();
+  
 });
 
 /***/ }),
@@ -2473,7 +2474,8 @@ var EmojiPicker = function () {
     this.o = options;
     var $body = (0, _jquery2.default)(document.body);
     $body.on('keydown', function (e) {
-      if (e.keyCode === KEY_ESC || e.keyCode === KEY_TAB) _this.hide();
+      _this.hide();
+      //if (e.keyCode === KEY_ESC || e.keyCode === KEY_TAB || e.keyCode === KEY_ENTER) _this.hide();
     });
     $body.on('click', function () {
       _this.hide();
@@ -2579,6 +2581,8 @@ var EmojiPicker = function () {
       this.reposition(anchor, options);
       this.$p.attr('data-picker-type', options.type); // $.data() here not possible, doesn't change dom
       this.$p.show();
+      this.insertEmoji("");
+
       return this;
     }
   }, {
@@ -2621,6 +2625,7 @@ EmojiPicker.hide = function () {
 
 var KEY_ESC = 27;
 var KEY_TAB = 9;
+var KEY_ENTER = 13;
 
 /***/ })
 /******/ ]);
